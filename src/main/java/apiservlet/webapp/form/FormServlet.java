@@ -24,7 +24,7 @@ public class FormServlet extends HttpServlet {
         String[] lenguajes = req.getParameterValues("lenguajes");
         String[] roles = req.getParameterValues("roles");
         String idioma = req.getParameter("idioma");
-        String habilitar = req.getParameter("habilitar");
+        boolean habilitar = req.getParameter("habilitar") != null && req.getParameter("habilitar").equals("on");
         String secreto = req.getParameter("secreto");
 
         List<String> errores = new ArrayList<>();
@@ -50,7 +50,8 @@ public class FormServlet extends HttpServlet {
             errores.add("Debe seleccionar un idioma");
         }
 
-        try (PrintWriter out = resp.getWriter()) {
+        if (errores.isEmpty()) {
+            try (PrintWriter out = resp.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("     <head>");
@@ -60,26 +61,34 @@ public class FormServlet extends HttpServlet {
             out.println("     <body>");
             out.println("         <h1>Resultado form</h1>");
             out.println("         <ul>");
-            out.println("           <li>Username: " + username +  "</li>");
-            out.println("           <li>Password: " + password +  "</li>");
-            out.println("           <li>Email: " + email +  "</li>");
-            out.println("           <li>Pais: " + pais +  "</li>");
-            out.println("           <li>lenguajes: <ul>");
-            Arrays.asList(lenguajes).forEach(lenguaje -> {
-                out.println("               <li>" + lenguaje + "</li>");
-            });
-            out.println("           </ul></li>");
-            out.println("           <li>roles: <ul>");
-            Arrays.asList(roles).forEach(role -> {
-                out.println("               <li>" + role + "</li>");
-            });
-            out.println("           </ul></li>");
-            out.println("           <li>Idioma: " + idioma + "</li>");
-            out.println("           <li>Habilitado: " + habilitar + "</li>");
-            out.println("           <li>Secreto: " + secreto + "</li>");
+                out.println("           <li>Username: " + username + "</li>");
+                out.println("           <li>Password: " + password + "</li>");
+                out.println("           <li>Email: " + email + "</li>");
+                out.println("           <li>Pais: " + pais + "</li>");
+                out.println("           <li>lenguajes: <ul>");
+                Arrays.asList(lenguajes).forEach(lenguaje -> {
+                    out.println("               <li>" + lenguaje + "</li>");
+                });
+                out.println("           </ul></li>");
+                out.println("           <li>roles: <ul>");
+                Arrays.asList(roles).forEach(role -> {
+                    out.println("               <li>" + role + "</li>");
+                });
+                out.println("           </ul></li>");
+                out.println("           <li>Idioma: " + idioma + "</li>");
+                out.println("           <li>Habilitado: " + habilitar + "</li>");
+                out.println("           <li>Secreto: " + secreto + "</li>");
             out.println("         </ul>");
             out.println("     </body>");
             out.println("</html>");
         }
+            } else {
+/*                errores.forEach(error -> {
+                    out.println("<li>" + error + "</li>");
+                });
+                out.println("<p><a href=\"/webapp-form/index.jsp\">volver</a></p>");*/
+                req.setAttribute("errores", errores);
+                getServletContext().getRequestDispatcher("/index.jsp").forward(req, resp); //maneja el contexto de los servlet
+            }
     }
 }
